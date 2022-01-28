@@ -44,7 +44,7 @@ internal class RemindMeCommand : ICommand {
 			await SendListMessage(e, false);
 			return;
 		} else if (tokenizedMessage.Length >= 1 && tokenizedMessage[0].ToLower() == "admin") {
-			await SendAdminMessage(e, tokenizedMessage);
+			await SendAdminMessage(e, tokenizedMessage[1..]);
 			return;
 		}
 
@@ -304,13 +304,13 @@ internal class RemindMeCommand : ICommand {
 		await listListener.CreateMessage();
 	}
 
-	private async Task SendAdminMessage(MessageCreateEventArgs e, string[] splitMessage) {
+	private async Task SendAdminMessage(MessageCreateEventArgs e, string[] remainingMessage) {
 		if (await module.AdminRepository.IsUserAdmin(this, e.Guild, e.Channel, e.Author)) {
 			using RemindMeDbContext dbContext = RemindMeDbContext.Get(module);
-			if (splitMessage.Length >= 3 && splitMessage[2].ToLower() == "list") {
+			if (remainingMessage.Length >= 1 && remainingMessage[0].ToLower() == "list") {
 				await SendListMessage(e, true);
-			} else if (splitMessage.Length >= 4 && splitMessage[2].ToLower() == "minrepeattime") {
-				if (ulong.TryParse(splitMessage[3], out ulong minRepeatTime)) {
+			} else if (remainingMessage.Length >= 2 && remainingMessage[0].ToLower() == "minrepeattime") {
+				if (ulong.TryParse(remainingMessage[1], out ulong minRepeatTime)) {
 					if (minRepeatTime == 0ul) {
 						dbContext.Settings.MinimumRepeatTime = minRepeatTime;
 						await dbContext.SaveChangesAsync();
@@ -341,8 +341,8 @@ internal class RemindMeCommand : ICommand {
 						Tag = "ReminderErrorInvalidMinFrequency"
 					});
 				}
-			} else if (splitMessage.Length >= 4 && splitMessage[2].ToLower() == "maxreminders") {
-				if (int.TryParse(splitMessage[3], out int maxReminders)) {
+			} else if (remainingMessage.Length >= 2 && remainingMessage[0].ToLower() == "maxreminders") {
+				if (int.TryParse(remainingMessage[1], out int maxReminders)) {
 					if (maxReminders > 0) {
 						dbContext.Settings.MaximumRemindersPerPerson = maxReminders;
 						await dbContext.SaveChangesAsync();

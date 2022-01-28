@@ -18,7 +18,7 @@ jobs:
         shell: pwsh
         continue-on-error: true
         run: |
-          $lastTag = $(git describe --tags --abbrev=0)
+          $lastTag = $(git tag --sort=version:refname | Select -Last 1)
           if ([string]::IsNullOrEmpty($lastTag)) {
             $newTag = "1.0.0-pre.1"
           } else {
