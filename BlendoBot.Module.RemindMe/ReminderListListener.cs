@@ -91,7 +91,7 @@ internal class ReminderListListener : IReactionListener, IDisposable {
 			if (showUsernames) {
 				sb.Append($"{reminder.User.Mention} in ");
 			}
-			sb.AppendLine($"{reminder.Channel.Mention} - \"{message}\"");
+			sb.AppendLine($"{reminder.Channel?.Mention ?? $"<#{reminder.ChannelId}>"} - \"{message}\"");
 			sb.Append($"Alerts at {TimeZoneInfo.ConvertTime(reminder.Time, userTimeZone).ToString(RemindMe.TimeFormatString)} {UserTimeZone.UserTimeZone.GetOffsetShortString(reminder.Time, userTimeZone)}");
 			if (reminder.IsRepeating) {
 				sb.Append(' ');
@@ -145,7 +145,7 @@ internal class ReminderListListener : IReactionListener, IDisposable {
 			scopedRemindersCount = await scopedReminders.CountAsync();
 		} while (scopedRemindersCount > 0 && remindersOnPage.Count == 0 && page > 0);
 		foreach (Reminder reminder in remindersOnPage) {
-			await reminder.UpdateCachedData(module.DiscordInteractor);
+			await reminder.UpdateCachedData(module.DiscordInteractor, module.Logger);
 		}
 		await message.ModifyAsync(GenerateMessage());
 		await UpdateReactions();

@@ -1,5 +1,7 @@
-﻿using BlendoBot.Core.Services;
+﻿using BlendoBot.Core.Entities;
+using BlendoBot.Core.Services;
 using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -34,8 +36,20 @@ internal class Reminder : IComparable<Reminder> {
 		User = null;
 	}
 
-	public async Task UpdateCachedData(IDiscordInteractor discordInteractor) {
-		Channel = await discordInteractor.GetChannel(this, ChannelId);
+	public async Task UpdateCachedData(IDiscordInteractor discordInteractor, ILogger logger) {
+		try {
+			Channel = await discordInteractor.GetChannel(this, ChannelId);
+		} catch (UnauthorizedException) {
+			logger.Log(this, new LogEventArgs {
+				Type = LogType.Warning,
+				Message = $"A 403 was received when trying to access channel ID {ChannelId} for reminder {ReminderId}, some behaviour may be a bit odd with this."
+			});
+		} catch (NotFoundException) {
+			logger.Log(this, new LogEventArgs {
+				Type = LogType.Warning,
+				Message = $"A 404 was received when trying to access channel ID {ChannelId} for reminder {ReminderId}, some behaviour may be a bit odd with this."
+			});
+		}
 		User = await discordInteractor.GetUser(this, UserId);
 	}
 

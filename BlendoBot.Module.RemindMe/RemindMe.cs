@@ -90,30 +90,42 @@ public class RemindMe : IModule, IDisposable {
 	}
 
 	private async Task ReminderElapsed(Reminder r, bool sleptIn) {
-		await r.UpdateCachedData(DiscordInteractor);
-		StringBuilder sb = new();
-		if (!sleptIn) {
-			sb.AppendLine($"{r.User.Mention} wanted to know this message now!");
-		} else {
-			sb.AppendLine($"I just woke up and forgot to send {r.User.Mention} this alert on time!");
-		}
-		sb.AppendLine(r.Message);
-		if (r.IsRepeating) {
-			await UpdateReminderTime(r);
-			TimeZoneInfo userTimeZone = ModuleManager.GetModule<UserTimeZone.UserTimeZone>(GuildId).GetUserTimeZone(r.User);
-			sb.AppendLine($"This reminder will repeat on {TimeZoneInfo.ConvertTime(r.Time, userTimeZone).ToString(TimeFormatString)} {UserTimeZone.UserTimeZone.GetOffsetShortString(r.Time, userTimeZone)}.");
-		}
-		try {
-			await DiscordInteractor.Send(this, new SendEventArgs {
-				Message = sb.ToString(),
-				Channel = r.Channel,
-				Tag = "ReminderAlert"
-			});
-		} catch (UnauthorizedException) {
+		await r.UpdateCachedData(DiscordInteractor, Logger);
+		if (r.Channel == null) {
 			Logger.Log(this, new LogEventArgs {
 				Type = LogType.Warning,
-				Message = $"Tried sending a reminder message {r.Message} which should've sent at {r.Time}, but a 403 was received! This tried to send to user {r.User.Mention} in channel {r.Channel.Mention}."
+				Message = $"Tried sending a reminder message {r.Message} which should've sent at {r.Time}, but an error was encountered with the channel! This tried to send to user {r.UserId} in channel {r.ChannelId}."
 			});
+		} else {
+			StringBuilder sb = new();
+			if (!sleptIn) {
+				sb.AppendLine($"{r.User.Mention} wanted to know this message now!");
+			} else {
+				sb.AppendLine($"I just woke up and forgot to send {r.User.Mention} this alert on time!");
+			}
+			sb.AppendLine(r.Message);
+			if (r.IsRepeating) {
+				await UpdateReminderTime(r);
+				TimeZoneInfo userTimeZone = ModuleManager.GetModule<UserTimeZone.UserTimeZone>(GuildId).GetUserTimeZone(r.User);
+				sb.AppendLine($"This reminder will repeat on {TimeZoneInfo.ConvertTime(r.Time, userTimeZone).ToString(TimeFormatString)} {UserTimeZone.UserTimeZone.GetOffsetShortString(r.Time, userTimeZone)}.");
+			}
+			try {
+				await DiscordInteractor.Send(this, new SendEventArgs {
+					Message = sb.ToString(),
+					Channel = r.Channel,
+					Tag = "ReminderAlert"
+				});
+			} catch (UnauthorizedException) {
+				Logger.Log(this, new LogEventArgs {
+					Type = LogType.Warning,
+					Message = $"Tried sending a reminder message {r.Message} which should've sent at {r.Time}, but a 403 was received! This tried to send to user {r.UserId} in channel {r.ChannelId}."
+				});
+			} catch (NotFoundException) {
+				Logger.Log(this, new LogEventArgs {
+					Type = LogType.Warning,
+					Message = $"Tried sending a reminder message {r.Message} which should've sent at {r.Time}, but a 404 was received! This tried to send to user {r.UserId} in channel {r.ChannelId}."
+				});
+			}
 		}
 		if (!r.IsRepeating) {
 			await DeleteReminder(r);
