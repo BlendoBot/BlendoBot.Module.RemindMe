@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other Files", "Other Files"
 		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlendoBot.Module.RemindMe.Tests", "BlendoBot.Module.RemindMe.Tests\BlendoBot.Module.RemindMe.Tests.csproj", "{83901833-8E3A-408A-B0FD-A3A6AC32F8D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{06BA8C00-2FB8-4BB4-B248-804B86A19791}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06BA8C00-2FB8-4BB4-B248-804B86A19791}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06BA8C00-2FB8-4BB4-B248-804B86A19791}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83901833-8E3A-408A-B0FD-A3A6AC32F8D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83901833-8E3A-408A-B0FD-A3A6AC32F8D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83901833-8E3A-408A-B0FD-A3A6AC32F8D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83901833-8E3A-408A-B0FD-A3A6AC32F8D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
