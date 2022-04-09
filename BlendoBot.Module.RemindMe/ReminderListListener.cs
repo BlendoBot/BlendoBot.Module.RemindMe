@@ -91,7 +91,7 @@ internal class ReminderListListener : IReactionListener, IDisposable {
 			if (showUsernames) {
 				sb.Append($"{reminder.User.Mention} in ");
 			}
-			sb.AppendLine($"{reminder.Channel?.Mention ?? $"<#{reminder.ChannelId}>"} - \"{message}\"");
+			sb.AppendLine($"{reminder.Channel?.Mention ?? $"<#{reminder.ChannelId}>"} - \"{Util.DisableLinkEmbeds(message)}\"");
 			sb.Append($"Alerts at {TimeZoneInfo.ConvertTime(reminder.Time, userTimeZone).ToString(RemindMe.TimeFormatString)} {UserTimeZone.UserTimeZone.GetOffsetShortString(reminder.Time, userTimeZone)}");
 			if (reminder.IsRepeating) {
 				sb.Append(' ');
